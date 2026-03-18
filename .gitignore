@@ -1,0 +1,46 @@
+# Qt user project files
+player.pro.user
+player.pro.*
+
+# Build output
+build/
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+*.lib
+*.pdb
+
+# Qt generated files
+.qmake.stash
+Makefile*
+ui_*.h
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+
+# Third-party libraries (large files)
+ffmpeg-4.2.1-win32-dev/
+SDL2/
+dll/
+
+# Logs and resources
+log/
+res/
+
+# IDE config
+.qtcreator/
+.vscode/
+.idea/
+
+# Binary assets
+*.ico
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.wav
+*.mp3
+*.mp4

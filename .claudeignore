@@ -1,0 +1,44 @@
+# 构建输出
+build/
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+*.lib
+*.pdb
+
+# Qt 生成的文件
+*.pro.user
+*.pro.user.*
+.qmake.stash
+Makefile*
+ui_*.h
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+
+# 第三方库 (大文件，不需要索引)
+ffmpeg-4.2.1-win32-dev/
+SDL2/
+dll/
+
+# 日志和资源
+log/
+res/
+
+# IDE 配置
+.qtcreator/
+.vscode/
+.idea/
+
+# 二进制资源文件
+*.ico
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.wav
+*.mp3
+*.mp4
