@@ -528,6 +528,7 @@ static void sdl_audio_callback(void *opaque, Uint8 *stream, int len)
         if (is->audio_buf && is->audio_volume == SDL_MIX_MAXVOLUME) {
             memcpy(stream, (uint8_t *)is->audio_buf + is->audio_buf_index, len1);
         } else {
+            //填充静音
             memset(stream, 0, len1);
             if (is->audio_buf) {
                 SDL_MixAudio(stream, (uint8_t *)is->audio_buf + is->audio_buf_index, len1, is->audio_volume);
@@ -1034,6 +1035,7 @@ int FFPlayer::read_thread()
              || (stream_has_enough_packets(audio_st, audio_stream, &audioq) &&
                  stream_has_enough_packets(video_st, video_stream, &videoq) ))) {
             /* wait 10 ms */
+            // 优化**：使用条件变量唤醒机制
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
             continue;
         }
@@ -1162,10 +1164,12 @@ retry:
                 goto display;
             }
             /* compute nominal last_duration */
+            // 计算理论帧间隔
             last_duration = vp_duration(lastvp, vp);
-            //             LOG(INFO) << "last_duration ......" << last_duration;
+                        // LOG(INFO) << "last_duration ......" << last_duration;
+            // 根据同步情况修正delay
             delay = compute_target_delay(last_duration);
-            //             LOG(INFO) << "delay ......" << delay;
+                        // LOG(INFO) << "delay ......" << delay;
             double time = av_gettime_relative() / 1000000.0;
             if (time <  frame_timer + delay) {
                 //                  LOG(INFO) << "(frame_timer + delay) - time " << frame_timer + delay - time;
@@ -1340,7 +1344,13 @@ int Decoder::decoder_decode_frame(AVFrame * frame)
                             }
                         }
                         break;
-                }
+                    case AVMEDIA_TYPE_UNKNOWN:
+                    case AVMEDIA_TYPE_DATA:
+                    case AVMEDIA_TYPE_SUBTITLE:
+                    case AVMEDIA_TYPE_ATTACHMENT:
+                    case AVMEDIA_TYPE_NB:
+                        break;
+                    }
                 // 1.3. 检查解码是否已经结束，解码结束返回0
                 if (ret == AVERROR_EOF) {
                     finished_ = pkt_serial_;

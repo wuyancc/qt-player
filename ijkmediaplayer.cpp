@@ -42,6 +42,7 @@ int IjkMediaPlayer::ijkmp_destroy()
     ffplayer_->ffp_destroy();
     return 0;
 }
+
 // 这个方法的设计来源于Android mediaplayer, 其本意是
 //int IjkMediaPlayer::ijkmp_set_data_source(Uri uri)
 int IjkMediaPlayer::ijkmp_set_data_source(const char *url)
