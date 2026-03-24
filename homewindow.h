@@ -75,9 +75,10 @@ private slots:
 
     void on_backFastBtn_clicked();
 
-    void on_playSlider_valueChanged(int value);
-
-    void on_settingBtn_clicked();
+    //画面翻转相关
+    void on_SetRotationNormal();
+    void on_SetRotation90CW();
+    void on_SetMirrorFlip();
 
 private:
 
@@ -101,6 +102,12 @@ private:
     // 定时器获取，每秒读取一次时间
     void reqUpdateCurrentPosition();
     void reqUpdateCacheDuration();
+
+    // 画面变换状态
+    int current_rotation_ = 0;      // 当前旋转角度
+    bool mirror_h_state_ = false;   // 水平镜像状态
+    bool mirror_v_state_ = false;   // 垂直镜像状态
+
 private:
     Ui::HomeWindow *ui;
 

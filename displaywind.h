@@ -5,7 +5,7 @@
 #include <QMutex>
 #include "ijkmediaplayer.h"
 #include "imagescaler.h"
-
+ #include "videofilter.h"
 
 
 namespace Ui {
@@ -23,6 +23,13 @@ public:
     void DeInit();
     void StartPlay();
     void StopPlay();
+
+
+    // 新增：画面变换控制
+    void SetRotation(int angle);        // 0, 90, 180, 270
+    void SetMirror(bool h, bool v);
+    void ResetTransform();
+
 protected:
     // 这里不要重载event事件，会导致paintEvent不被触发
     void paintEvent(QPaintEvent *) override;
@@ -49,6 +56,9 @@ private:
     ImageScaler *img_scaler_ = NULL;
 
     int play_state_ = 0;    // 0 初始化状态; 1 播放状态; 2 停止状态
+
+    VideoFilter *video_filter_ = nullptr;  // 新增：视频滤镜
+    AVFrame *filtered_frame_ = nullptr;    // 滤镜输出帧
 };
 
 #endif // DISPLAYWIND_H

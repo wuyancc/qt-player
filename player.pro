@@ -43,7 +43,8 @@ SOURCES += \
     screenshot.cpp \
     toast.cpp \
     ijksdl_timer.cpp \
-    log/easylogging++.cc
+    log/easylogging++.cc \
+    videofilter.cpp
 
 HEADERS += \
         homewindow.h \
@@ -65,7 +66,8 @@ HEADERS += \
     screenshot.h \
     toast.h \
     ijksdl_timer.h \
-    log/easylogging++.h
+    log/easylogging++.h \
+    videofilter.h
 
 FORMS += \
         homewindow.ui \
@@ -93,3 +95,6 @@ LIBS += $$PWD/ffmpeg-4.2.1-win32-dev/lib/avformat.lib   \
 
 RESOURCES += \
     resource.qrc
+
+# 解决 FFmpeg 在 C++ 环境下的宏定义冲突问题
+DEFINES += __STDC_CONSTANT_MACROS

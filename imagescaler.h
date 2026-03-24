@@ -167,6 +167,32 @@ public:
         else
             return RET_FAIL;
     }
+
+    RET_CODE Scale3Frame(const AVFrame *src_frame, VideoFrame *dst_frame) {
+        // 检查参数变化时重新初始化
+        if(src_frame->width != src_width_
+            || src_frame->height != src_height_
+            || src_frame->format != src_pix_fmt_
+            || !sws_ctx_) {
+            DeInit();
+            RET_CODE ret = Init(src_frame->width, src_frame->height, src_frame->format,
+                                dst_frame->width, dst_frame->height, dst_frame->format,
+                                en_alogrithm_);
+            if(ret != RET_OK) {
+                return ret;
+            }
+        }
+
+        int dst_slice_h = sws_scale(sws_ctx_,
+                                    (const uint8_t **)src_frame->data,
+                                    src_frame->linesize,
+                                    0,
+                                    src_frame->height,
+                                    dst_frame->data,
+                                    dst_frame->linesize);
+        return dst_slice_h > 0 ? RET_OK : RET_FAIL;
+    }
+
 private:
 
     SwsContext*	sws_ctx_;		//SWS对象

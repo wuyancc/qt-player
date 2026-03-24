@@ -722,9 +722,9 @@
      <property name="title">
       <string>方向</string>
      </property>
-     <addaction name="action_6"/>
-     <addaction name="action_7"/>
-     <addaction name="action_8"/>
+     <addaction name="SetRotation90CW"/>
+     <addaction name="SetMirrorFlip"/>
+     <addaction name="SetRotationNormal"/>
     </widget>
     <widget class="QMenu" name="menu_4">
      <property name="title">
@@ -767,17 +767,17 @@
     <string>冷色</string>
    </property>
   </action>
-  <action name="action_6">
+  <action name="SetRotation90CW">
    <property name="text">
-    <string>旋转</string>
+    <string>顺时针90旋转</string>
    </property>
   </action>
-  <action name="action_7">
+  <action name="SetMirrorFlip">
    <property name="text">
-    <string>翻转</string>
+    <string>镜像翻转</string>
    </property>
   </action>
-  <action name="action_8">
+  <action name="SetRotationNormal">
    <property name="text">
     <string>正常</string>
    </property>

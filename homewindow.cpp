@@ -97,6 +97,10 @@ int HomeWindow::InitSignalsAndSlots()
     // 打开文件
     connect(ui->openFileAction, &QAction::triggered, this, &HomeWindow::on_openFile);
     connect(ui->openUrlAction, &QAction::triggered, this, &HomeWindow::on_openNetworkUrl);
+    // 方向菜单 - 画面变换
+    connect(ui->SetRotationNormal, &QAction::triggered, this, &HomeWindow::on_SetRotationNormal);
+    connect(ui->SetRotation90CW, &QAction::triggered, this, &HomeWindow::on_SetRotation90CW);
+    connect(ui->SetMirrorFlip, &QAction::triggered, this, &HomeWindow::on_SetMirrorFlip);
     connect(this, &HomeWindow::sig_updatePlayOrPause, this, &HomeWindow::on_updatePlayOrPause);
     return 0;
 }
@@ -696,6 +700,26 @@ void HomeWindow::stopTimer()
         delete play_time_;
         play_time_ = nullptr;
     }
+}
+
+
+void HomeWindow::on_SetRotationNormal() {
+    current_rotation_ = 0;
+    mirror_h_state_ = false;
+    mirror_v_state_ = false;
+    ui->display->ResetTransform();
+}
+
+void HomeWindow::on_SetRotation90CW() {
+    // 循环切换：0 -> 90 -> 180 -> 270 -> 0
+    current_rotation_ = (current_rotation_ + 90) % 360;
+    ui->display->SetRotation(current_rotation_);
+}
+
+void HomeWindow::on_SetMirrorFlip() {
+    // 水平镜像切换（toggle）
+    mirror_h_state_ = !mirror_h_state_;
+    ui->display->SetMirror(mirror_h_state_, mirror_v_state_);
 }
 
 
