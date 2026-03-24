@@ -24,6 +24,7 @@ public:
 
 protected:
     virtual void  resizeEvent(QResizeEvent *event);
+    virtual void  keyPressEvent(QKeyEvent *event);
     void resizeUI();
 signals:
     // 发送要显示的提示信息
@@ -79,6 +80,8 @@ private slots:
     void on_SetRotationNormal();
     void on_SetRotation90CW();
     void on_SetMirrorFlip();
+
+    void on_FullScreenBtn_clicked();
 
 private:
 

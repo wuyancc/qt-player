@@ -311,7 +311,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="displayRatioBtn">
+       <widget class="QPushButton" name="FullScreenBtn">
         <property name="minimumSize">
          <size>
           <width>40</width>
@@ -325,7 +325,7 @@
          </size>
         </property>
         <property name="text">
-         <string>16:9</string>
+         <string>全屏</string>
         </property>
        </widget>
       </item>

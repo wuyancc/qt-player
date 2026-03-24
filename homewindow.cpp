@@ -3,6 +3,7 @@
 #include <QDateTime>
 #include <QFileDialog>
 #include <QUrl>
+#include <QKeyEvent>
 #include <thread>
 #include <functional>
 #include <iostream>
@@ -198,10 +199,16 @@ void HomeWindow::resizeUI()
     LOG(INFO) << "width: " << width;
     // 获取当前ctrlwidget的位置
     QRect rect =   ui->ctrlBar->geometry();
-    rect.setY(height - ui->menuBar->height() - rect.height());
-    //    LOG(INFO) << "rect: " << rect;
-    rect.setWidth(width);
-    ui->ctrlBar->setGeometry(rect);
+    if (ui->ctrlBar->isVisible()) {
+        int y_pos = height - rect.height();
+        if (ui->menuBar->isVisible()) {
+            y_pos -= ui->menuBar->height();
+        }
+        rect.setY(y_pos);
+        //    LOG(INFO) << "rect: " << rect;
+        rect.setWidth(width);
+        ui->ctrlBar->setGeometry(rect);
+    }
     // 设置setting和listbutton的位置
     rect = ui->settingBtn->geometry();
     // 获取 ctrlBar的大小 计算list的 x位置
@@ -219,7 +226,14 @@ void HomeWindow::resizeUI()
     } else {
         width = this->width();
     }
-    height = this->height() - ui->ctrlBar->height() - ui->menuBar->height();
+    // 计算显示区域高度，如果控件可见则减去其高度
+    height = this->height();
+    if (ui->ctrlBar->isVisible()) {
+        height -= ui->ctrlBar->height();
+    }
+    if (ui->menuBar->isVisible()) {
+        height -= ui->menuBar->height();
+    }
     //    int y1 = ui->menuBar->height();
     int y1 = 0;
     ui->display->setGeometry(0, y1, width, height);
@@ -724,3 +738,45 @@ void HomeWindow::on_SetMirrorFlip() {
 
 
 
+//全屏
+void HomeWindow::on_FullScreenBtn_clicked()
+{
+    if (isFullScreen()) {
+        // 退出全屏
+        showNormal();
+        ui->menuBar->show();
+        ui->ctrlBar->show();
+        if (is_show_file_list_) {
+            ui->playList->show();
+        }
+        // 恢复窗口样式
+        setStyleSheet(GlobalHelper::GetQssStr("://res/qss/homewindow.css"));
+    } else {
+        // 进入全屏
+        showFullScreen();
+        ui->menuBar->hide();
+        ui->ctrlBar->hide();
+        ui->playList->hide();
+        // 全屏时可能不需要窗口样式
+        setStyleSheet("");
+    }
+    resizeUI();
+}
+
+void HomeWindow::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Escape && isFullScreen()) {
+        // ESC键退出全屏
+        showNormal();
+        ui->menuBar->show();
+        ui->ctrlBar->show();
+        if (is_show_file_list_) {
+            ui->playList->show();
+        }
+        setStyleSheet(GlobalHelper::GetQssStr("://res/qss/homewindow.css"));
+        resizeUI();
+        event->accept();
+    } else {
+        QMainWindow::keyPressEvent(event);
+    }
+}
