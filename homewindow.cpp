@@ -57,6 +57,8 @@ HomeWindow::HomeWindow(QWidget *parent) :
     network_jitter_duration_ = 100; // 默认100ms
     initUi();
     InitSignalsAndSlots();
+    // 初始布局
+    resizeUI();
 }
 
 HomeWindow::~HomeWindow()
@@ -194,62 +196,79 @@ void HomeWindow::resizeEvent(QResizeEvent *event)
 
 void HomeWindow::resizeUI()
 {
-    int width = this->width();
-    int height = this->height();
-    LOG(INFO) << "width: " << width;
-    // 获取当前ctrlwidget的位置
-    QRect rect =   ui->ctrlBar->geometry();
-    if (ui->ctrlBar->isVisible()) {
-        int y_pos = height - rect.height();
-        if (ui->menuBar->isVisible()) {
-            y_pos -= ui->menuBar->height();
-        }
-        rect.setY(y_pos);
-        //    LOG(INFO) << "rect: " << rect;
-        rect.setWidth(width);
-        ui->ctrlBar->setGeometry(rect);
+    // 获取centralWidget的尺寸，所有子部件都在centralWidget内
+    QWidget *central = ui->centralWidget;
+    int cw_width = central->width();
+    int cw_height = central->height();
+
+    LOG(INFO) << "centralWidget width: " << cw_width << ", height: " << cw_height;
+
+    // 1. 设置ctrlBar的位置：在centralWidget底部
+    QRect rect = ui->ctrlBar->geometry();
+    LOG(INFO) << "ctrlBar geometry: x=" << rect.x() << ", y=" << rect.y()
+              << ", width=" << rect.width() << ", height=" << rect.height();
+
+    // 确保ctrlBar高度有效
+    int ctrlBarHeight = rect.height();
+    if (ctrlBarHeight <= 0) {
+        ctrlBarHeight = ui->ctrlBar->height();
+        LOG(INFO) << "ctrlBar height from geometry <= 0, using height(): " << ctrlBarHeight;
     }
-    // 设置setting和listbutton的位置
+    if (ctrlBarHeight <= 0) {
+        ctrlBarHeight = 95; // UI文件中的默认高度
+        LOG(INFO) << "ctrlBar height still <= 0, using default: " << ctrlBarHeight;
+    }
+
+    // 计算ctrlBar的y位置：在centralWidget底部
+    int ctrlBarY = cw_height - ctrlBarHeight;
+    LOG(INFO) << "Setting ctrlBar: y=" << ctrlBarY << ", width=" << cw_width << ", height=" << ctrlBarHeight;
+
+    // 设置ctrlBar的位置和大小
+    rect.setRect(0, ctrlBarY, cw_width, ctrlBarHeight);
+    ui->ctrlBar->setGeometry(rect);
+
+    // 2. 设置display的位置：在centralWidget顶部，占据ctrlBar之上的空间
+    int displayWidth = cw_width;
+    int displayHeight = cw_height;
+
+    // 减去ctrlBar的高度（如果ctrlBar没有被隐藏）
+    if (!ui->ctrlBar->isHidden()) {
+        displayHeight -= ctrlBarHeight;
+    }
+
+    // 是否显示文件列表
+    if (is_show_file_list_) {
+        displayWidth -= ui->playList->width();
+    }
+
+    LOG(INFO) << "Setting display: x=0, y=0, width=" << displayWidth << ", height=" << displayHeight;
+    ui->display->setGeometry(0, 0, displayWidth, displayHeight);
+
+    // 3. 设置文件列表的位置
+    if (is_show_file_list_) {
+        ui->playList->setGeometry(displayWidth, 0, ui->playList->width(), displayHeight);
+    }
+
+    // 4. 设置ctrlBar内部按钮的位置（这些是ctrlBar的子部件，坐标相对于ctrlBar）
+    // 设置listBtn和settingBtn的位置
     rect = ui->settingBtn->geometry();
-    // 获取 ctrlBar的大小 计算list的 x位置
-    int  x1 =  ui->ctrlBar->width() - rect.width() - rect.width() / 8 * 2;
-    ui->listBtn->setGeometry(x1, rect.y(), rect.width(), rect.height());
-    //    LOG(INFO) << "listBtn: " << ui->listBtn->geometry();
-    // 设置setting button的位置，在listbutton左侧
+    int listBtnX = ui->ctrlBar->width() - rect.width() - rect.width() / 8 * 2;
+    ui->listBtn->setGeometry(listBtnX, rect.y(), rect.width(), rect.height());
+
     rect = ui->listBtn->geometry();
-    x1 = rect.x() - rect.width() - rect.width() / 8 ;
-    ui->settingBtn->setGeometry(x1, rect.y(), rect.width(), rect.height());
-    //    LOG(INFO) << "settingBtn: " << ui->settingBtn->geometry();
-    // 设置 显示画面
-    if(is_show_file_list_) {
-        width = this->width() - ui->playList->width();
-    } else {
-        width = this->width();
-    }
-    // 计算显示区域高度，如果控件可见则减去其高度
-    height = this->height();
-    if (ui->ctrlBar->isVisible()) {
-        height -= ui->ctrlBar->height();
-    }
-    if (ui->menuBar->isVisible()) {
-        height -= ui->menuBar->height();
-    }
-    //    int y1 = ui->menuBar->height();
-    int y1 = 0;
-    ui->display->setGeometry(0, y1, width, height);
-    // 设置文件列表 list
-    if(is_show_file_list_) {
-        ui->playList->setGeometry(ui->display->width(), y1, ui->playList->width(), height);
-    }
-    // 设置播放进度条的长度，设置成和显示控件宽度一致
+    int settingBtnX = rect.x() - rect.width() - rect.width() / 8;
+    ui->settingBtn->setGeometry(settingBtnX, rect.y(), rect.width(), rect.height());
+
+    // 5. 设置播放进度条的长度，使其与display宽度一致
     rect = ui->playSlider->geometry();
-    width = ui->display->width() - 5 - 5;
-    rect.setWidth(width);
+    int playSliderWidth = displayWidth - 5 - 5;
+    rect.setWidth(playSliderWidth);
     ui->playSlider->setGeometry(5, rect.y(), rect.width(), rect.height());
-    // 设置音量条位置
-    x1 = this->width() - 5 - ui->volumeSlider->width();
+
+    // 6. 设置音量条位置，在ctrlBar的右侧
     rect = ui->volumeSlider->geometry();
-    ui->volumeSlider->setGeometry(x1, rect.y(), rect.width(), rect.height());
+    int volumeSliderX = ui->ctrlBar->width() - 5 - rect.width();
+    ui->volumeSlider->setGeometry(volumeSliderX, rect.y(), rect.width(), rect.height());
 }
 
 void HomeWindow::on_UpdateAudioCacheDuration(int64_t duration)
