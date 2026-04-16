@@ -1060,7 +1060,7 @@ int FFPlayer::read_thread()
         } else {
             eof = 0;
         }
-        // 插入队列  先只处理音频包
+        // 插入队列
         if (pkt->stream_index == audio_stream) {
             //            LOG(INFO) << "audio ===== pkt pts:" << pkt->pts << ", dts:" << pkt->dts;
             packet_queue_put(&audioq, pkt);
@@ -1171,12 +1171,22 @@ retry:
             delay = compute_target_delay(last_duration);
                         // LOG(INFO) << "delay ......" << delay;
             double time = av_gettime_relative() / 1000000.0;
+            //time是当前时间，frame_timer是上一帧时间基准 delay是上一帧的显示时间 这表示没到显示时间，计算该等待的时间直接返回
             if (time <  frame_timer + delay) {
                 //                  LOG(INFO) << "(frame_timer + delay) - time " << frame_timer + delay - time;
                 *remaining_time = FFMIN( frame_timer + delay - time, *remaining_time);
                 goto display;
             }
             frame_timer += delay;
+            //实际时间已经远超预期的 frame_timer（差距超过同步阈值上限，通常是 100ms 左右）
+            // 这种情况通常发生在：
+            //         - 暂停恢复后 frame_timer 没及时对齐
+            //         - 系统卡顿/切后台再切回来
+            //         - 前面大量丢帧导致时间基准严重落后
+
+            //     如果不重置，frame_timer 会远远落后于 time，导致接下来很多帧都满足 time >= frame_timer + delay，视频会以极快速度连续播放多帧去"还债"，观感就是画面突然快进或错乱。
+
+            // frame_timer = time 就是把基准时间对齐到当前时刻，丢弃掉累积的延迟债务，让播放从这一帧重新开始按正常节奏走。
             if (delay > 0 && time -  frame_timer > AV_SYNC_THRESHOLD_MAX) {
                 frame_timer = time;
             }
@@ -1191,6 +1201,7 @@ retry:
                 duration = vp_duration(vp, nextvp);
                 if (!step && (framedrop > 0 || (framedrop && get_master_sync_type() != AV_SYNC_VIDEO_MASTER))
                     && time >  frame_timer + duration) {
+                    //time >  frame_timer + duration 表示当前帧已过期，直接丢帧
                     frame_drops_late++;
                     //                    LOG(INFO) << "frame_drops_late  " << frame_drops_late;
                     frame_queue_next(&pictq);
