@@ -1,6 +1,6 @@
 # Qt 跨平台媒体播放器
 
-一款基于 **Qt + FFmpeg + SDL2** 开发的跨平台桌面媒体播放器，采用 **UI 与播放核心分离** 的架构设计，便于后续向 Android / iOS / Linux / macOS 等多平台迁移。
+一款基于 **Qt + FFmpeg + SDL2** 开发的跨平台桌面媒体播放器，采用 **UI 与播放核心分离** 的架构设计，便于后续向 Android / iOS / Linux / macOS 等多平台迁移。支持本地文件和网络链接播放。
 
 ![player](docs/player.png)
 
