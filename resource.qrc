@@ -4,6 +4,7 @@
     </qresource>
     <qresource prefix="/">
         <file>res/qss/homewindow.css</file>
+        <file>res/qss/ctrlbar.css</file>
         <file>res/array_down.png</file>
         <file>res/checkbox_checked.png</file>
         <file>res/checkbox_checked_disable.png</file>
@@ -16,5 +17,15 @@
         <file>res/radiobutton_checked.png</file>
         <file>res/radiobutton_checked_disable.png</file>
         <file>res/radiobutton_unchecked.png</file>
+        <file>res/backward.png</file>
+        <file>res/forward.png</file>
+        <file>res/fullscreen.png</file>
+        <file>res/next.png</file>
+        <file>res/pause.png</file>
+        <file>res/play.png</file>
+        <file>res/playlist.png</file>
+        <file>res/prev.png</file>
+        <file>res/stop.png</file>
+        <file>res/volume.png</file>
     </qresource>
 </RCC>

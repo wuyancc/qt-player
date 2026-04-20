@@ -71,6 +71,40 @@ void HomeWindow::initUi()
     //加载样式
     QString qss = GlobalHelper::GetQssStr("://res/qss/homewindow.css");
     setStyleSheet(qss);
+
+    // 设置按钮图标
+    int iconSize = 24;
+    ui->playOrPauseBtn->setIcon(QIcon(":/res/play.png"));
+    ui->playOrPauseBtn->setIconSize(QSize(iconSize, iconSize));
+    ui->playOrPauseBtn->setText("");
+
+    ui->stopBtn->setIcon(QIcon(":/res/stop.png"));
+    ui->stopBtn->setIconSize(QSize(iconSize, iconSize));
+    ui->stopBtn->setText("");
+
+    ui->backFastBtn->setIcon(QIcon(":/res/backward.png"));
+    ui->backFastBtn->setIconSize(QSize(iconSize, iconSize));
+    ui->backFastBtn->setText("");
+
+    ui->forwardFastBtn->setIcon(QIcon(":/res/forward.png"));
+    ui->forwardFastBtn->setIconSize(QSize(iconSize, iconSize));
+    ui->forwardFastBtn->setText("");
+
+    ui->prevBtn->setIcon(QIcon(":/res/prev.png"));
+    ui->prevBtn->setIconSize(QSize(iconSize, iconSize));
+    ui->prevBtn->setText("");
+
+    ui->nextBtn->setIcon(QIcon(":/res/next.png"));
+    ui->nextBtn->setIconSize(QSize(iconSize, iconSize));
+    ui->nextBtn->setText("");
+
+    ui->FullScreenBtn->setIcon(QIcon(":/res/fullscreen.png"));
+    ui->FullScreenBtn->setIconSize(QSize(iconSize, iconSize));
+    ui->FullScreenBtn->setText("");
+
+    ui->listBtn->setIcon(QIcon(":/res/playlist.png"));
+    ui->listBtn->setIconSize(QSize(iconSize, iconSize));
+    ui->listBtn->setText("");
 }
 
 int HomeWindow::InitSignalsAndSlots()
@@ -454,9 +488,9 @@ void HomeWindow::on_playOrPauseBtn_clicked()
 void HomeWindow::on_updatePlayOrPause(int state)
 {
     if(state == MP_STATE_STARTED) {
-        ui->playOrPauseBtn->setText("暂停");
+        ui->playOrPauseBtn->setIcon(QIcon(":/res/pause.png"));
     } else  {
-        ui->playOrPauseBtn->setText("播放");
+        ui->playOrPauseBtn->setIcon(QIcon(":/res/play.png"));
     }
     LOG(INFO) << "play state: " << state;
 }
@@ -556,7 +590,7 @@ bool HomeWindow::stop()
         real_time_ = 0;
         is_accelerate_speed_ = false;
         ui->display->StopPlay();        // 停止渲染，后续刷黑屏
-        ui->playOrPauseBtn->setText("播放");
+        ui->playOrPauseBtn->setIcon(QIcon(":/res/play.png"));
         return 0;
     } else {
         return -1;
@@ -776,8 +810,12 @@ void HomeWindow::on_FullScreenBtn_clicked()
         ui->menuBar->hide();
         ui->ctrlBar->hide();
         ui->playList->hide();
-        // 全屏时可能不需要窗口样式
-        setStyleSheet("");
+        // 全屏时保留暗色背景样式，避免黑边处显示白色
+        setStyleSheet(R"(
+            QMainWindow { background-color: #1a1a1a; }
+            QWidget#centralWidget { background-color: #1a1a1a; }
+            QWidget#display { background-color: #000000; }
+        )");
     }
     resizeUI();
 }
